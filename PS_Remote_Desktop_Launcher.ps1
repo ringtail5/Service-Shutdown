@@ -127,6 +127,8 @@ Remove-Item -Path C:\RemoteConnectionTempFolder\ -Recurse -ErrorAction SilentlyC
 $result = $mainForm.ShowDialog()
 if ($result -eq [System.Windows.Forms.DialogResult]::Cancel)
 {
+    #TODO: Figure out how to delete the folder after clicking Done... it was working
+    #now it doesn't (because the connection is starting)
     sleep -Seconds 10
     Remove-Item -Path C:\RemoteConnectionTempFolder\ -Recurse
 }
