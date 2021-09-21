@@ -5,11 +5,12 @@ function start-rdp{
     [int]$Computer
     )
     $ip = [string]$IPAddress.Text
-    $un = [string]$userName.Text
     New-Item -ItemType Directory -Name RemoteConnectionTempFolder -Path C:\
     Out-File -InputObject "full address:s:$ip" -FilePath "c:\RemoteConnectionTempFolder\Connection$Computer.rdp"
-    Set-Location c:\RemoteConnectionTempFolder\
-    Start-Process -FilePath ./Connection$Computer.rdp
+    Out-File -InputObject "prompt for credentials:i:1" -FilePath "c:\RemoteConnectionTempFolder\Connection$Computer.rdp" -Append
+    Out-File -InputObject "administrative session:i:1" -FilePath "c:\RemoteConnectionTempFolder\Connection$Computer.rdp" -Append
+    $start = Start-Process -FilePath c:\RemoteConnectionTempFolder\Connection$Computer.rdp -PassThru
+    $startID = $start.Id
 }
 #Define the Class
 Add-Type -AssemblyName System.Windows.Forms
@@ -19,7 +20,7 @@ Add-Type -AssemblyName System.Drawing
 $mainForm = New-Object System.Windows.Forms.Form
 $mainForm.Text = 'Remote Desktop Launcher'
 $mainForm.Width = '550'
-$mainForm.Height = '300'
+$mainForm.Height = '250'
 $mainForm.StartPosition = 'CenterScreen'
 $mainForm.AutoSize = $false
 $mainForm.AutoScale = $false
@@ -27,7 +28,7 @@ $mainForm.AutoScale = $false
 #Add Done Button
 $doneButton = New-Object System.Windows.Forms.Button
 $doneButton.Size = New-Object System.Drawing.Size(70,25)
-$doneButton.Top = '228'
+$doneButton.Top = '178'
 $doneButton.Left = '235'
 $doneButton.Text = 'Done'
 $doneButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
@@ -93,42 +94,28 @@ $button3.Text = "Launch"
 $groupBox3.Controls.AddRange(@($label3,$textBox3,$button3))
 $mainForm.Controls.Add($groupBox3)
 
-#Section for username
-$label4 = New-Object System.Windows.Forms.Label
-$label4.Text = "User Name:"
-$label4.Location = '10,200'
-$label4.AutoSize = $true
-$textBox4 = New-Object System.Windows.Forms.TextBox
-$textBox4.Location = '80,197'
-$textBox4.Size = '150,20'
-$mainForm.Controls.Add($label4)
-$mainForm.Controls.Add($textBox4)
-
 #button Functionality
 $button1.Add_Click(
     {
-        Start-RDP -IPAddress $textBox1 -Computer 1 -userName $textBox4
+        Start-RDP -IPAddress $textBox1 -Computer 1
     }
 )
 $button2.Add_Click(
     {
-        Start-RDP -IPAddress $textBox2
+        Start-RDP -IPAddress $textBox2 -Computer 2
     }
 )
 $button3.Add_Click(
     {
-        Start-RDP -IPAddress $textBox3
+        Start-RDP -IPAddress $textBox3 -Computer 3
     }
 )
-#Clean up from previous session
-Remove-Item -Path C:\RemoteConnectionTempFolder\ -Recurse -ErrorAction SilentlyContinue
 
 #Display Window
 $result = $mainForm.ShowDialog()
+
+#Clean up used files when Done is clicked
 if ($result -eq [System.Windows.Forms.DialogResult]::Cancel)
 {
-    #TODO: Figure out how to delete the folder after clicking Done... it was working
-    #now it doesn't (because the connection is starting)
-    sleep -Seconds 10
-    Remove-Item -Path C:\RemoteConnectionTempFolder\ -Recurse
+    Remove-Item -Path 'C:\RemoteConnectionTempFolder\' -Recurse
 }
