@@ -9,8 +9,7 @@ function start-rdp{
     Out-File -InputObject "full address:s:$ip" -FilePath "c:\RemoteConnectionTempFolder\Connection$Computer.rdp"
     Out-File -InputObject "prompt for credentials:i:1" -FilePath "c:\RemoteConnectionTempFolder\Connection$Computer.rdp" -Append
     Out-File -InputObject "administrative session:i:1" -FilePath "c:\RemoteConnectionTempFolder\Connection$Computer.rdp" -Append
-    $start = Start-Process -FilePath c:\RemoteConnectionTempFolder\Connection$Computer.rdp -PassThru
-    $startID = $start.Id
+    Start-Process -FilePath c:\RemoteConnectionTempFolder\Connection$Computer.rdp
 }
 #Define the Class
 Add-Type -AssemblyName System.Windows.Forms
